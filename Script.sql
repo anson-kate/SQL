@@ -1,17 +1,17 @@
---В каких городах больше одного аэропорта?
+# В каких городах больше одного аэропорта?
 select city, count (airport_code)
 from airports a 
 group by city 
 having count (airport_code)  > 1
 
---В каких аэропортах есть рейсы, выполняемые самолетом с максимальной дальностью перелета?
+#В каких аэропортах есть рейсы, выполняемые самолетом с максимальной дальностью перелета?
 select distinct airport_name, f.flight_no, a2.aircraft_code, a2.model 
 from airports a
 join flights f on a.airport_code = f.departure_airport 
 join aircrafts a2 on a2.aircraft_code = f.aircraft_code 
 where a2."range" = (select max (a3."range") from aircrafts a3);
 
---Вывести 10 рейсов с максимальным временем задержки вылета
+#Вывести 10 рейсов с максимальным временем задержки вылета
 select 	f.flight_id, f.flight_no, f.scheduled_departure, f.actual_departure, 
 	f.actual_departure - f.scheduled_departure "Çàäåðæêà"
 from flights f
