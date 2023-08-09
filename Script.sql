@@ -1,25 +1,25 @@
---В каких городах больше одного аэропорта?
+--Р’ РєР°РєРёС… РіРѕСЂРѕРґР°С… Р±РѕР»СЊС€Рµ РѕРґРЅРѕРіРѕ Р°СЌСЂРѕРїРѕСЂС‚Р°?
 select city, count (airport_code)
 from airports a 
 group by city 
 having count (airport_code)  > 1
 
---В каких аэропортах есть рейсы, выполняемые самолетом с максимальной дальностью перелета?
+--Р’ РєР°РєРёС… Р°СЌСЂРѕРїРѕСЂС‚Р°С… РµСЃС‚СЊ СЂРµР№СЃС‹, РІС‹РїРѕР»РЅСЏРµРјС‹Рµ СЃР°РјРѕР»РµС‚РѕРј СЃ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РґР°Р»СЊРЅРѕСЃС‚СЊСЋ РїРµСЂРµР»РµС‚Р°?
 select distinct airport_name, f.flight_no, a2.aircraft_code, a2.model 
 from airports a
 join flights f on a.airport_code = f.departure_airport 
 join aircrafts a2 on a2.aircraft_code = f.aircraft_code 
 where a2."range" = (select max (a3."range") from aircrafts a3);
 
---Вывести 10 рейсов с максимальным временем задержки вылета
+--Р’С‹РІРµСЃС‚Рё 10 СЂРµР№СЃРѕРІ СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј РІСЂРµРјРµРЅРµРј Р·Р°РґРµСЂР¶РєРё РІС‹Р»РµС‚Р°
 select 	f.flight_id, f.flight_no, f.scheduled_departure, f.actual_departure, 
-	f.actual_departure - f.scheduled_departure "Задержка"
+	f.actual_departure - f.scheduled_departure "Г‡Г Г¤ГҐГ°Г¦ГЄГ "
 from flights f
 where f.actual_departure is not null
-order by "Задержка" desc
+order by "Г‡Г Г¤ГҐГ°Г¦ГЄГ " desc
 limit 10;
 
---Были ли брони, по которым не были получены посадочные талоны?
+--Р‘С‹Р»Рё Р»Рё Р±СЂРѕРЅРё, РїРѕ РєРѕС‚РѕСЂС‹Рј РЅРµ Р±С‹Р»Рё РїРѕР»СѓС‡РµРЅС‹ РїРѕСЃР°РґРѕС‡РЅС‹Рµ С‚Р°Р»РѕРЅС‹?
 SELECT count(t2.book_ref)
 FROM ticket_flights t 
 JOIN flights f ON t.flight_id = f.flight_id 
@@ -41,11 +41,11 @@ join tickets t on t.book_ref = b.book_ref
 left join boarding_passes bp on bp.ticket_no = t.ticket_no 
 where bp.boarding_no is null;
 
---Найдите свободные места для каждого рейса, их % отношение к общему количеству мест в самолете.  
---Добавьте столбец с накопительным итогом - суммарное накопление количества вывезенных пассажиров из каждого
--- аэропорта на каждый день. 
---Т.е. в этом столбце должна отражаться накопительная сумма - сколько человек уже вылетело из
--- данного аэропорта на этом или более ранних рейсах за день.
+--РќР°Р№РґРёС‚Рµ СЃРІРѕР±РѕРґРЅС‹Рµ РјРµСЃС‚Р° РґР»СЏ РєР°Р¶РґРѕРіРѕ СЂРµР№СЃР°, РёС… % РѕС‚РЅРѕС€РµРЅРёРµ Рє РѕР±С‰РµРјСѓ РєРѕР»РёС‡РµСЃС‚РІСѓ РјРµСЃС‚ РІ СЃР°РјРѕР»РµС‚Рµ.  
+--Р”РѕР±Р°РІСЊС‚Рµ СЃС‚РѕР»Р±РµС† СЃ РЅР°РєРѕРїРёС‚РµР»СЊРЅС‹Рј РёС‚РѕРіРѕРј - СЃСѓРјРјР°СЂРЅРѕРµ РЅР°РєРѕРїР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РІС‹РІРµР·РµРЅРЅС‹С… РїР°СЃСЃР°Р¶РёСЂРѕРІ РёР· РєР°Р¶РґРѕРіРѕ
+-- Р°СЌСЂРѕРїРѕСЂС‚Р° РЅР° РєР°Р¶РґС‹Р№ РґРµРЅСЊ. 
+--Рў.Рµ. РІ СЌС‚РѕРј СЃС‚РѕР»Р±С†Рµ РґРѕР»Р¶РЅР° РѕС‚СЂР°Р¶Р°С‚СЊСЃСЏ РЅР°РєРѕРїРёС‚РµР»СЊРЅР°СЏ СЃСѓРјРјР° - СЃРєРѕР»СЊРєРѕ С‡РµР»РѕРІРµРє СѓР¶Рµ РІС‹Р»РµС‚РµР»Рѕ РёР·
+-- РґР°РЅРЅРѕРіРѕ Р°СЌСЂРѕРїРѕСЂС‚Р° РЅР° СЌС‚РѕРј РёР»Рё Р±РѕР»РµРµ СЂР°РЅРЅРёС… СЂРµР№СЃР°С… Р·Р° РґРµРЅСЊ.
 with boarded as (
 	select 
 		f.flight_id,
@@ -75,7 +75,7 @@ select
 	b.boarded_count,
 	m.max_seats - b.boarded_count free_seats, 
 	round((m.max_seats - b.boarded_count) / m.max_seats :: dec, 2) * 100 free_seats_percent,
-	sum(b.boarded_count) over (partition by (b.departure_airport, b.actual_departure::date) order by b.actual_departure) "Накопительно пассажиров"
+	sum(b.boarded_count) over (partition by (b.departure_airport, b.actual_departure::date) order by b.actual_departure) "ГЌГ ГЄГ®ГЇГЁГІГҐГ«ГјГ­Г® ГЇГ Г±Г±Г Г¦ГЁГ°Г®Гў"
 from boarded b 
 join max_seats_by_aircraft m on m.aircraft_code = b.aircraft_code;
 
@@ -103,35 +103,35 @@ a.model,
 ts.fact_passengers,
 ts.total_seats,
 round( (ts.total_seats - ts.fact_passengers)::numeric /
-ts.total_seats::numeric, 2 ) *100 AS "% мест свободно",
+ts.total_seats::numeric, 2 ) *100 AS "% Г¬ГҐГ±ГІ Г±ГўГ®ГЎГ®Г¤Г­Г®",
 sum (ts.fact_passengers) over (partition by (ts.departure_airport, ts.actual_departure::date)
-order by ts.actual_departure) "Накопительно пассажиров"
+order by ts.actual_departure) "ГЌГ ГЄГ®ГЇГЁГІГҐГ«ГјГ­Г® ГЇГ Г±Г±Г Г¦ГЁГ°Г®Гў"
 FROM ts JOIN aircrafts AS a
 ON ts.aircraft_code = a.aircraft_code
 ORDER BY ts.actual_departure;
 
---Найдите процентное соотношение перелетов по типам самолетов от общего количества
+--РќР°Р№РґРёС‚Рµ РїСЂРѕС†РµРЅС‚РЅРѕРµ СЃРѕРѕС‚РЅРѕС€РµРЅРёРµ РїРµСЂРµР»РµС‚РѕРІ РїРѕ С‚РёРїР°Рј СЃР°РјРѕР»РµС‚РѕРІ РѕС‚ РѕР±С‰РµРіРѕ РєРѕР»РёС‡РµСЃС‚РІР°
 select 
-	a.model "Модель самолета",
-	count(f.flight_id) "Количество рейсов",
+	a.model "РњРѕРґРµР»СЊ СЃР°РјРѕР»РµС‚Р°",
+	count(f.flight_id) "РљРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР№СЃРѕРІ",
 	round(count(f.flight_id) /
 		(select count(f.flight_id)
 		from flights f 
-		where f.actual_departure is not null)::dec * 100, 2) "В % от общего числа"
+		where f.actual_departure is not null)::dec * 100, 2) "Р’ % РѕС‚ РѕР±С‰РµРіРѕ С‡РёСЃР»Р°"
 from aircrafts a 
 join flights f on f.aircraft_code = a.aircraft_code 
 where f.actual_departure is not null
 group by a.model;
 
 SELECT a.model, count (*), 
-       round (count(*)*100 / sum(count(*)) OVER(),2) as "В % от общего числа"
+       round (count(*)*100 / sum(count(*)) OVER(),2) as "Р’ % РѕС‚ РѕР±С‰РµРіРѕ С‡РёСЃР»Р°"
 from aircrafts a 
 join flights f on f.aircraft_code = a.aircraft_code 
 where f.actual_departure is not null
 group by a.model 
 order by count(*)
 
---Были ли города, в которые можно  добраться бизнес - классом дешевле, чем эконом-классом в рамках перелета?
+--Р‘С‹Р»Рё Р»Рё РіРѕСЂРѕРґР°, РІ РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ  РґРѕР±СЂР°С‚СЊСЃСЏ Р±РёР·РЅРµСЃ - РєР»Р°СЃСЃРѕРј РґРµС€РµРІР»Рµ, С‡РµРј СЌРєРѕРЅРѕРј-РєР»Р°СЃСЃРѕРј РІ СЂР°РјРєР°С… РїРµСЂРµР»РµС‚Р°?
 with min_and_max as(
 	select 
 		a.city dep_city,
@@ -145,15 +145,15 @@ with min_and_max as(
 	join airports a2 on f.arrival_airport = a2.airport_code
 	group by (1, 2, 3))
 select 
-	dep_city "Город отправления", 
-	arr_city "Город прибытия", 
-	min(b_min_amount) "Минимум за бизнес", 
-	max(e_max_amount) "Максимум за эконом"
+	dep_city "ГѓГ®Г°Г®Г¤ Г®ГІГЇГ°Г ГўГ«ГҐГ­ГЁГї", 
+	arr_city "ГѓГ®Г°Г®Г¤ ГЇГ°ГЁГЎГ»ГІГЁГї", 
+	min(b_min_amount) "ГЊГЁГ­ГЁГ¬ГіГ¬ Г§Г  ГЎГЁГ§Г­ГҐГ±", 
+	max(e_max_amount) "ГЊГ ГЄГ±ГЁГ¬ГіГ¬ Г§Г  ГЅГЄГ®Г­Г®Г¬"
 from min_and_max
 group by (1, 2)
 having min(b_min_amount) < max(e_max_amount);
 
---Между какими городами нет прямых рейсов?
+--ГЊГҐГ¦Г¤Гі ГЄГ ГЄГЁГ¬ГЁ ГЈГ®Г°Г®Г¤Г Г¬ГЁ Г­ГҐГІ ГЇГ°ГїГ¬Г»Гµ Г°ГҐГ©Г±Г®Гў?
 SELECT a1.city as departure_city, a2.city as arrival_city 
 FROM airports a1, airports a2
 WHERE a1.city <> a2.city
@@ -177,18 +177,18 @@ where a.city != a2.city
 except 
 select * from dep_arr_city
 
---Вычислите расстояние между аэропортами, связанными прямыми рейсами, сравните с 
---допустимой максимальной дальностью перелетов  в самолетах, обслуживающих эти рейсы
+--Г‚Г»Г·ГЁГ±Г«ГЁГІГҐ Г°Г Г±Г±ГІГ®ГїГ­ГЁГҐ Г¬ГҐГ¦Г¤Гі Г ГЅГ°Г®ГЇГ®Г°ГІГ Г¬ГЁ, Г±ГўГїГ§Г Г­Г­Г»Г¬ГЁ ГЇГ°ГїГ¬Г»Г¬ГЁ Г°ГҐГ©Г±Г Г¬ГЁ, Г±Г°Г ГўГ­ГЁГІГҐ Г± 
+--Г¤Г®ГЇГіГ±ГІГЁГ¬Г®Г© Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г®Г© Г¤Г Г«ГјГ­Г®Г±ГІГјГѕ ГЇГҐГ°ГҐГ«ГҐГІГ®Гў  Гў Г±Г Г¬Г®Г«ГҐГІГ Гµ, Г®ГЎГ±Г«ГіГ¦ГЁГўГ ГѕГ№ГЁГµ ГЅГІГЁ Г°ГҐГ©Г±Г»
 CREATE EXTENSION IF NOT EXISTS cube; 
 CREATE EXTENSION IF NOT EXISTS earthdistance; 
-SELECT distinct ad.airport_name "Из", aa.airport_name "В",
-a.model, a."range" "Дальность самолета",
-round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude,aa.latitude))* 1.609344) as "Дальность перелета",
+SELECT distinct ad.airport_name "Г€Г§", aa.airport_name "Г‚",
+a.model, a."range" "Г„Г Г«ГјГ­Г®Г±ГІГј Г±Г Г¬Г®Г«ГҐГІГ ",
+round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude,aa.latitude))* 1.609344) as "Г„Г Г«ГјГ­Г®Г±ГІГј ГЇГҐГ°ГҐГ«ГҐГІГ ",
 case when
 	a."range" < round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude, aa.latitude))* 1.609344)
-	then 'Не допустимое'
-	else 'Допустимое'
-	end "Допустимость расстояния"
+	then 'ГЌГҐ Г¤Г®ГЇГіГ±ГІГЁГ¬Г®ГҐ'
+	else 'Г„Г®ГЇГіГ±ГІГЁГ¬Г®ГҐ'
+	end "Г„Г®ГЇГіГ±ГІГЁГ¬Г®Г±ГІГј Г°Г Г±Г±ГІГ®ГїГ­ГЁГї"
 from flights f
 join airports ad on f.departure_airport = ad.airport_code
 join airports aa on f.arrival_airport = aa.airport_code
