@@ -1,17 +1,17 @@
-# В каких городах больше одного аэропорта?
+-- В каких городах больше одного аэропорта?
 select city, count (airport_code)
 from airports a 
 group by city 
 having count (airport_code)  > 1
 
-#В каких аэропортах есть рейсы, выполняемые самолетом с максимальной дальностью перелета?
+-- В каких аэропортах есть рейсы, выполняемые самолетом с максимальной дальностью перелета?
 select distinct airport_name, f.flight_no, a2.aircraft_code, a2.model 
 from airports a
 join flights f on a.airport_code = f.departure_airport 
 join aircrafts a2 on a2.aircraft_code = f.aircraft_code 
 where a2."range" = (select max (a3."range") from aircrafts a3);
 
-#Вывести 10 рейсов с максимальным временем задержки вылета
+-- Вывести 10 рейсов с максимальным временем задержки вылета
 select 	f.flight_id, f.flight_no, f.scheduled_departure, f.actual_departure, 
 	f.actual_departure - f.scheduled_departure "Çàäåðæêà"
 from flights f
@@ -145,15 +145,15 @@ with min_and_max as(
 	join airports a2 on f.arrival_airport = a2.airport_code
 	group by (1, 2, 3))
 select 
-	dep_city "Ãîðîä îòïðàâëåíèÿ", 
-	arr_city "Ãîðîä ïðèáûòèÿ", 
-	min(b_min_amount) "Ìèíèìóì çà áèçíåñ", 
-	max(e_max_amount) "Ìàêñèìóì çà ýêîíîì"
+	dep_city "Город отправления", 
+	arr_city "Город прибытия", 
+	min(b_min_amount) "Минимум за бизнес", 
+	max(e_max_amount) "Максимум за эконом"
 from min_and_max
 group by (1, 2)
 having min(b_min_amount) < max(e_max_amount);
 
---Ìåæäó êàêèìè ãîðîäàìè íåò ïðÿìûõ ðåéñîâ?
+--Между какими городами нет прямых рейсов?
 SELECT a1.city as departure_city, a2.city as arrival_city 
 FROM airports a1, airports a2
 WHERE a1.city <> a2.city
@@ -177,18 +177,18 @@ where a.city != a2.city
 except 
 select * from dep_arr_city
 
---Âû÷èñëèòå ðàññòîÿíèå ìåæäó àýðîïîðòàìè, ñâÿçàííûìè ïðÿìûìè ðåéñàìè, ñðàâíèòå ñ 
---äîïóñòèìîé ìàêñèìàëüíîé äàëüíîñòüþ ïåðåëåòîâ  â ñàìîëåòàõ, îáñëóæèâàþùèõ ýòè ðåéñû
+--Вычислите расстояние между аэропортами, связанными прямыми рейсами, сравните с 
+--допустимой максимальной дальностью перелетов  в самолетах, обслуживающих эти рейсы
 CREATE EXTENSION IF NOT EXISTS cube; 
 CREATE EXTENSION IF NOT EXISTS earthdistance; 
-SELECT distinct ad.airport_name "Èç", aa.airport_name "Â",
-a.model, a."range" "Äàëüíîñòü ñàìîëåòà",
-round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude,aa.latitude))* 1.609344) as "Äàëüíîñòü ïåðåëåòà",
+SELECT distinct ad.airport_name "Из", aa.airport_name "В",
+a.model, a."range" "Дальность самолета",
+round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude,aa.latitude))* 1.609344) as "Дальность перелета",
 case when
 	a."range" < round(( point (ad.longitude, ad.latitude)  <@> point (aa.longitude, aa.latitude))* 1.609344)
-	then 'Íå äîïóñòèìîå'
-	else 'Äîïóñòèìîå'
-	end "Äîïóñòèìîñòü ðàññòîÿíèÿ"
+	then 'Не допустимое'
+	else 'Допустимое'
+	end "Допустимость расстояния"
 from flights f
 join airports ad on f.departure_airport = ad.airport_code
 join airports aa on f.arrival_airport = aa.airport_code
